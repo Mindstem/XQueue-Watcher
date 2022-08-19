@@ -243,10 +243,19 @@ class JailedGrader(Grader):
 
         # If there were no tests run, then there was probably an error, so it's incorrect
         n = len(corrects)
-        results['correct'] = all(corrects) and n > 0
+
+        # *** ALLOW GRADERS WITH ONLY INPUT CHECKS & NO TESTS ***
+        # =======================================================
+        results['correct'] = all(corrects) and (n or grader._input_checks)
+        # -------------------------------------------------------
+
         results['score'] = float(sum(corrects))/n if n > 0 else 0
 
-        if n == 0 and len(results['errors']) == 0:
+        # *** ALLOW GRADERS WITH ONLY INPUT CHECKS & NO TESTS ***
+        # =======================================================
+        if not (n or results['errors'] or grader._input_checks):
+        # -------------------------------------------------------
+
             results['errors'] = [
                 _("There was a problem while running your code (Staff debug: L450). "
                   "Please contact the course staff for assistance.")
