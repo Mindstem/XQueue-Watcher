@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
--e git+https://github.com/edx/codejail.git@4127fc4bd5775cc72aee8d7f0a70e31405e22439#egg=codejail
+EdX-CodeJail >= 3.2.0
     # via -r requirements/base.txt
 certifi==2022.6.15
     # via
@@ -20,7 +20,7 @@ idna==3.3
     # via
     #   -r requirements/base.txt
     #   requests
-newrelic==7.16.0.178
+# newrelic==7.16.0.178   # TODO: fix installation error
     # via -r requirements/base.txt
 path==16.4.0
     # via
