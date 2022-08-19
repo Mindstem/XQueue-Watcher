@@ -5,6 +5,7 @@ setup(
     version='0.2',
     description='XQueue Pull Grader',
     packages=[
+        'grader_support',
         'xqueue_watcher',
     ],
     install_requires=open('requirements/production.txt', 'rt').readlines()
