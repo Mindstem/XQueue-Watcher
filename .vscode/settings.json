@@ -17,6 +17,8 @@
 
   "python.linting.pylintEnabled": true,
   "python.linting.pylintArgs": [
+    "--disable", "consider-using-with",
+    "--disable", "missing-module-docstring",
   ],
 
   "python.linting.flake8Enabled": true,
