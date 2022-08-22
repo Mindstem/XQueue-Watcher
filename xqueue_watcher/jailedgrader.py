@@ -115,7 +115,14 @@ class JailedGrader(Grader):
 
         self._enable_i18n(grader_config.get("lang", LANGUAGE))
 
-        answer_path = Path(grader_path).dirname() / 'answer.py'
+        # *** MINOR TEMP FIX TO ACCOMMODATE MULTIPLE ANSWER FILES ***
+        # ===========================================================
+        answer_path = ((parent_dir_path := Path(grader_path).parent) /   # noqa: W504
+                       next(file_name
+                            for file_name in os.listdir(path=parent_dir_path)
+                            if file_name.lower().startswith('answer')
+                            and file_name.endswith('.py')))   # noqa: W503
+        # -----------------------------------------------------------
         with open(answer_path, 'rb') as f:
             answer = f.read().decode('utf-8')
 
