@@ -139,6 +139,13 @@ class JailedGrader(Grader):
             # Don't run tests if there were errors
             return results
 
+        # *** IF THERE'RE ONLY INPUT CHECKS & NO TESTS, THEN RETURN CORRECT ***
+        # =====================================================================
+        elif not grader._tests:   # pylint: disable=protected-access
+            results['correct'] = True
+            return results
+        # ---------------------------------------------------------------------
+
         # Add a unicode encoding declaration.
         processed_answer = prepend_coding(grader.preprocess(answer))
         processed_submission = prepend_coding(grader.preprocess(submission))
