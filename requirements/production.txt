@@ -20,11 +20,7 @@ idna==3.4
     # via
     #   -r requirements/base.txt
     #   requests
-<<<<<<< HEAD
-# newrelic==7.16.0.178   # TODO: fix installation error
-=======
 newrelic==8.7.0
->>>>>>> 180d12060386e88b36f0bcdc12a2e4c77db2a49f
     # via -r requirements/base.txt
 path==16.6.0
     # via
