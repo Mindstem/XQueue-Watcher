@@ -115,7 +115,14 @@ class JailedGrader(Grader):
 
         self._enable_i18n(grader_config.get("lang", LANGUAGE))
 
-        answer_path = Path(grader_path).dirname() / 'answer.py'
+        # *** MINOR TEMP FIX TO ACCOMMODATE MULTIPLE ANSWER FILES ***
+        # ===========================================================
+        answer_path = ((parent_dir_path := Path(grader_path).parent) /   # noqa: W504
+                       next(file_name
+                            for file_name in os.listdir(path=parent_dir_path)
+                            if file_name.lower().startswith('answer')
+                            and file_name.endswith('.py')))   # noqa: W503
+        # -----------------------------------------------------------
         with open(answer_path, 'rb') as f:
             answer = f.read().decode('utf-8')
 
@@ -131,6 +138,13 @@ class JailedGrader(Grader):
             results['errors'].extend(errors)
             # Don't run tests if there were errors
             return results
+
+        # *** IF THERE'RE ONLY INPUT CHECKS & NO TESTS, THEN RETURN CORRECT ***
+        # =====================================================================
+        elif not grader._tests:   # pylint: disable=protected-access
+            results['correct'] = True
+            return results
+        # ---------------------------------------------------------------------
 
         # Add a unicode encoding declaration.
         processed_answer = prepend_coding(grader.preprocess(answer))
@@ -243,14 +257,23 @@ class JailedGrader(Grader):
 
         # If there were no tests run, then there was probably an error, so it's incorrect
         n = len(corrects)
-        results['correct'] = all(corrects) and n > 0
+
+        # *** ALLOW GRADERS WITH ONLY INPUT CHECKS & NO TESTS ***
+        # =======================================================
+        _n = len(grader._input_checks)   # pylint: disable=protected-access
+        results['correct'] = all(corrects) and ((n > 0) or (_n > 0))
+        # -------------------------------------------------------
+
         results['score'] = float(sum(corrects))/n if n > 0 else 0
 
-        if n == 0 and len(results['errors']) == 0:
+        # *** ALLOW GRADERS WITH ONLY INPUT CHECKS & NO TESTS ***
+        # =======================================================
+        if not (n or results['errors'] or _n):
             results['errors'] = [
                 _("There was a problem while running your code (Staff debug: L450). "
                   "Please contact the course staff for assistance.")
             ]
+        # -------------------------------------------------------
 
         return results
 
@@ -275,10 +298,10 @@ def main(args):     # pragma: no cover
     (grader_path, submission_path) = args
 
     with open(submission_path) as f:
-        submission = f.read().decode('utf-8')
+        submission = f.read()   # .decode('utf-8')
 
     grader_config = {"lang": "eo"}
-    grader_path = path(grader_path).abspath()
+    grader_path = Path(grader_path).abspath()
     g = JailedGrader(grader_root=grader_path.dirname().parent.parent)
     pprint(g.grade(grader_path, grader_config, submission))
 
